@@ -30,7 +30,8 @@ status_t delete_entry(uint32_t index);
 status_t delete_all_entries(void);
 
 /*
- * Returns the number of timestamps in the array *timestamps.
+ * Returns the number of timestamps.
+ * The timestamps are stored in the array *timestamps.
  * If no timestamps are returned, *timestamps will be NULL.
  * The array must be freed when no longer used.
  */

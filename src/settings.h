@@ -4,14 +4,20 @@
 
 #define FMT_SIZE 64
 
-char format[FMT_SIZE];
+// Use %x vs. %D for "locale-dependent" date
+// Use %X vs. %T for "locale-dependent" date
 const char *formats[] = {
-  "%D %T",  // %m/%d/%y %H:%M:%S  (24hr)
-  "%D %H:%M",  // %m/%d/%y %H:%M  (24hr)
-  "%D %I:%M"  // %m/%d/%y %I:%M  (12hr)
+  "%D %T",  // 08/23/01 14:55:02
+  "%D %R",  // 08/23/01 14:55
+  "%D %r"  // 08/23/01 02:55:02 pm
 };
 
-char *get_format(int idx) {
-  strncpy(format, formats[idx], FMT_SIZE);
-  return format;
-}
+/*
+ * Sets the format string selected at index idx.
+ */
+void set_format(int idx);
+
+/*
+ * Gets the set format string.
+ */
+char *get_format(void);
