@@ -1,0 +1,28 @@
+{
+    "author": "Northern-Lights",
+    "dependencies": {},
+    "keywords": [],
+    "name": "timestamp",
+    "pebble": {
+        "capabilities": [
+            ""
+        ],
+        "displayName": "Timestamp",
+        "enableMultiJS": false,
+        "messageKeys": {},
+        "projectType": "native",
+        "resources": {
+            "media": []
+        },
+        "sdkVersion": "3",
+        "targetPlatforms": [
+            "aplite",
+            "basalt"
+        ],
+        "uuid": "7e205c91-2ce9-4518-8e99-73920d1c9bfc",
+        "watchapp": {
+            "watchface": false
+        }
+    },
+    "version": "0.1.0"
+}
