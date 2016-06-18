@@ -1,3 +1,9 @@
+/*
+ * Kicks off the main Timestamp program.
+ * Displays an error message and does not
+ * start up if any initialization fails.
+ */
+
 #include <pebble.h>
 #include "main_menu.h"
 #include "storage.h"

@@ -1,7 +1,13 @@
-#include <pebble.h>
+/*
+ * Retrieves the current epoch time and
+ * enters it into permanent storage.
+ *
+ * Exposes a callback to display a message
+ * in the SimpleMenuItem in the main_menu
+ * when the timestamp is taken.
+ */
 
-void show_take_timestamp(void);
-void hide_take_timestamp(void);
+#include <pebble.h>
 
 /*
  * Lets the take_timestamp component

@@ -1,3 +1,14 @@
+/*
+ * This module handles storage of timestamps.
+ * Entries are basically stored in an array
+ * starting with index 1 since 0 is reserved
+ * for the number of timestamps.
+ *
+ * The future implementation should use a
+ * linked list data structure to make deletion
+ * more sensible.
+ */
+
 #pragma once
 
 #include <pebble.h>

@@ -32,7 +32,7 @@ void show_timestamps_callback_end(void *ctx) {
 
 void show_timestamps_callback(int idx, void *ctx) {
   
-  // If no entries, just say so in the subtitle.
+  // If no entries, just say so in the subtitle of the main_menu item.
   if (!available_entries()) {
     menu_item->subtitle = no_entries_text;
     SimpleMenuLayer *smenu_layer = *((SimpleMenuLayer**) ctx);
@@ -112,6 +112,8 @@ static void handle_window_unload(Window* window) {
   destroy_ui();
 }
 
+// TODO: Remove "if"; decision made by the callback.
+// Also make static since outsiders do not open this window.
 void show_show_timestamps(void) {
   initialise_ui();
   window_set_window_handlers(s_window, (WindowHandlers) {
