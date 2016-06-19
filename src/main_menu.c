@@ -2,6 +2,7 @@
 #include "main_menu.h"
 #include "take_timestamp.h"
 #include "show_timestamps.h"
+#include "timestamp_format.h"
 
 #define NSECTIONS 2
 #define NACTION_ITEMS 2
@@ -52,9 +53,9 @@ void delete(int idx, void *ctx) {
 
 static void setup_config_section(void) {
   config_items[ISETTINGS] = (SimpleMenuItem) {
-    .title = "Clear All Data",
-    .subtitle = "Wipe all entries",
-    .callback = delete
+    .title = "Timestamp Format",
+    .subtitle = NULL,
+    .callback = timestamp_format_callback
   };
   
   smenu_sections[SCONFIG] = (SimpleMenuSection) {
