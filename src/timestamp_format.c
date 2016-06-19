@@ -2,14 +2,20 @@
 #include "global.h"
 #include "timestamp_format.h"
 
+#define MSG_DELAY (3 * 1000)
+
 /*
  * Static function prototypes
  */
 
 static void set_format(int idx, void *ctx);
+static void set_format_end(void *ctx);
 static void show_timestamp_format(void);
 static void hide_timestamp_format(Window *w);
 
+/*
+ * items related to format strings.
+ */
 // Use %x vs. %D for "locale-dependent" date
 // Use %X vs. %T for "locale-dependent" time
 static const char *formats[] = {
@@ -18,9 +24,25 @@ static const char *formats[] = {
   "%x %r"  // 08/23/01 02:55:02 pm
 };
 
+// set_format() fills this which is passed around to
+// other modules via get_format().
 static char format[FMT_SIZE];
 
 #define NFORMATS ((int)(sizeof(formats)/sizeof(char *)))
+
+/*
+ * UI-related items.
+ */
+#define NSECTIONS 1
+#define NITEMS NFORMATS
+
+static Window *window;
+static SimpleMenuLayer *smenu_layer;
+static SimpleMenuSection smenu_sections[NSECTIONS];
+static SimpleMenuItem smenu_items[NITEMS];
+
+#define NCHARS 30
+static char format_strs[NITEMS][NCHARS];
 
 /*
  * Sets the format string selected at index idx.
@@ -28,8 +50,28 @@ static char format[FMT_SIZE];
  * callback but does nothing with it.
  */
 static void set_format(int idx, void *ctx) {
+  
+  // Write the data
   strncpy(format, formats[idx], sizeof(format) - 1);
   persist_write_int(KTS_FORMAT, (int) idx);
+  
+  // Show some feedback, then hide it after set time.
+  smenu_items[idx].subtitle = "Set!";
+  smenu_items[idx].callback = NULL;
+  layer_mark_dirty((Layer *) smenu_layer);
+  
+  // Have to use this tricky conversion to get an int passed to callback
+  app_timer_register(MSG_DELAY, set_format_end, (void *) ((long) idx));
+}
+
+/*
+ * After MSG_DELAY ms, reset the smenu_item back to its original text.
+ */
+static void set_format_end(void *ctx) {
+  int idx = (int) ctx;
+  smenu_items[idx].subtitle = format_strs[idx];
+  smenu_items[idx].callback = set_format;
+  layer_mark_dirty((Layer *) smenu_layer);
 }
 
 char *get_format(void) {
@@ -63,20 +105,10 @@ void init_timestamp_format(void) {
   set_format(idx, NULL);
 }
 
-#define NSECTIONS 1
-#define NITEMS NFORMATS
-
-static Window *window;
-static SimpleMenuLayer *smenu_layer;
-static SimpleMenuSection smenu_sections[NSECTIONS];
-static SimpleMenuItem smenu_items[NITEMS];
-
-#define NCHARS 30
-static char format_strs[NITEMS][NCHARS];
-
 static void hide_timestamp_format(Window *w) {
   window_destroy(w);
   window_stack_remove(w, true);
+  // TODO: Cancel set_format_end() timer?
 }
 
 static void show_timestamp_format(void) {
