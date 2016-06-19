@@ -1,7 +1,7 @@
 #include <pebble.h>
 #include "take_timestamp.h"
+#include "timestamp_format.h"
 #include "storage.h"
-//#include "settings.h"  //Will be needed to get setings such as timestamp formatting.
 
 #define BUFSIZE 64
 #define MSG_DELAY (3*1000)

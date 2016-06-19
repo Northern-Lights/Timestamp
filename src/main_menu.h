@@ -1,12 +1,9 @@
-#include <pebble.h>
-
-/**
- * Callback to destroy the main menu when the app closes
+/*
+ * A SimpleMenuLayer presenting the user with actions
+ * and configurations to choose from.
  */
-// void destroy_menu(Window *window);  // Now static
 
 /**
  * Initialize the menu listing with actions and config settings
  */
-// void setup_menu(Window *window);
 void setup_menu(void);
