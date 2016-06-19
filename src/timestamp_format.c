@@ -2,6 +2,14 @@
 #include "global.h"
 #include "timestamp_format.h"
 
+/*
+ * Static function prototypes
+ */
+
+static void set_format(int idx, void *ctx);
+static void show_timestamp_format(void);
+static void hide_timestamp_format(Window *w);
+
 // Use %x vs. %D for "locale-dependent" date
 // Use %X vs. %T for "locale-dependent" time
 static const char *formats[] = {
