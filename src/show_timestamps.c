@@ -1,6 +1,7 @@
 #include <pebble.h>
 #include "show_timestamps.h"
 
+#include "timestamp_format.h"
 #include "storage.h"
 
 #define MSG_DELAY (3 * 1000)
@@ -56,7 +57,7 @@ static uint32_t setup_timestamp_menu(Window *window) {
     time_t epoch = entries[i];
     struct tm *timedata = localtime(&epoch);
     char *title = (char *) malloc(64 * sizeof(char));  // Need non-stack mem
-    strftime(title, 64, "%D %T", timedata);  // TODO: fmt str from settings
+    strftime(title, 64, get_format(), timedata);
     smenu_items[i] = (SimpleMenuItem) {
 //       .title = title,
 //       .subtitle = NULL,

@@ -1,4 +1,5 @@
 #include <pebble.h>
+#include "global.h"
 #include "timestamp_format.h"
 
 // Use %x vs. %D for "locale-dependent" date
@@ -11,6 +12,8 @@ static const char *formats[] = {
 
 static char format[FMT_SIZE];
 
+#define NFORMATS ((int)(sizeof(formats)/sizeof(char *)))
+
 /*
  * Sets the format string selected at index idx.
  * Takes (void *) because it is a SimpleMenuItem
@@ -18,14 +21,42 @@ static char format[FMT_SIZE];
  */
 static void set_format(int idx, void *ctx) {
   strncpy(format, formats[idx], sizeof(format) - 1);
+  persist_write_int(KTS_FORMAT, (int) idx);
 }
 
 char *get_format(void) {
+  
+  // If not set, default to the first.
+  // TODO: Make it a user setting so it can't be unset.
+  if (format[0] == '\0') {
+    set_format(0, NULL);
+  }
   return format;
 }
 
+void init_timestamp_format(void) {
+  
+  // Default to the first format if not saved by user.
+  uint32_t idx = 0;
+  
+  // Check if there's a user-saved value.
+  // If so, and it's out of range, default to 0.
+  if (persist_exists(KTS_FORMAT)) {
+    idx = (uint32_t) persist_read_int(KTS_FORMAT);
+    if (idx > NFORMATS) {
+      idx = 0;
+      APP_LOG(APP_LOG_LEVEL_WARNING,
+              "TS_FORMAT is %u, but there are only %u formats.",
+              (unsigned int) idx,
+              (unsigned int) NFORMATS);
+    }
+  }
+  
+  set_format(idx, NULL);
+}
+
 #define NSECTIONS 1
-#define NITEMS ((int)(sizeof(formats)/sizeof(char *)))
+#define NITEMS NFORMATS
 
 static Window *window;
 static SimpleMenuLayer *smenu_layer;

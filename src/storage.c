@@ -1,13 +1,8 @@
 #include <pebble.h>
+#include "global.h"
 #include "storage.h"
 
 // TODO: Implement linked list for more efficient delete & move
-
-#define MAX_TIMESTAMPS (512)
-
-// Define static keys for persistent storage
-// TODO: This should probably go under settings
-#define KNUM_ENTRIES (0)
 
 static uint32_t num_entries = 0;
 static bool initialized = S_FALSE;

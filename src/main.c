@@ -7,6 +7,7 @@
 #include <pebble.h>
 #include "main_menu.h"
 #include "storage.h"
+#include "timestamp_format.h"
 
 // TODO: Move the main_window into main_menu.c
 static Window *message_window;
@@ -43,6 +44,8 @@ static void handle_init(void) {
     storage_error(message_window);
     return;
   }
+  
+  init_timestamp_format();
   
   setup_menu();
 }

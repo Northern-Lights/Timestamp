@@ -16,6 +16,11 @@
 char *get_format(void);
 
 /*
+ * Initialize the format with the user's settings or default.
+ */
+void init_timestamp_format(void);
+
+/*
  * A callback which initiates the window for
  * timestamp format selection.
  */
