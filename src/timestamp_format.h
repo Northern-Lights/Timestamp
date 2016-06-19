@@ -11,11 +11,6 @@
 #define FMT_SIZE 64
 
 /*
- * Sets the format string selected at index idx.
- */
-void set_format(int idx);
-
-/*
  * Gets the set format string.
  */
 char *get_format(void);

@@ -11,7 +11,12 @@ static const char *formats[] = {
 
 static char format[FMT_SIZE];
 
-void set_format(int idx) {
+/*
+ * Sets the format string selected at index idx.
+ * Takes (void *) because it is a SimpleMenuItem
+ * callback but does nothing with it.
+ */
+static void set_format(int idx, void *ctx) {
   strncpy(format, formats[idx], sizeof(format) - 1);
 }
 
@@ -52,7 +57,7 @@ static void show_timestamp_format(void) {
     smenu_items[i] = (SimpleMenuItem) {
       .title = NULL,
       .subtitle = format_strs[i],
-      .callback = NULL
+      .callback = set_format
     };
   }
   
