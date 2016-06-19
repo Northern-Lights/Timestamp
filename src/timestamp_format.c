@@ -94,7 +94,7 @@ static void show_timestamp_format(void) {
   
   // Create the section and give it the items
   smenu_sections[0] = (SimpleMenuSection) {
-    .title = "Timestamp Display Format",
+    .title = "Choose Display Format",
     .items = smenu_items,
     .num_items = NITEMS
   };
