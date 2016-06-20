@@ -46,6 +46,8 @@ void show_timestamps_callback(int idx, void *ctx) {
   show_show_timestamps();
 }
 
+void show_action_bar(int idx, void *ctx);
+
 static uint32_t setup_timestamp_menu(Window *window) {
   
   // Get saved timestamps and create an array for them
@@ -63,7 +65,7 @@ static uint32_t setup_timestamp_menu(Window *window) {
 //       .subtitle = NULL,
       .title = NULL,
       .subtitle = title,
-      .callback = NULL
+      .callback = show_action_bar
     };
   }
   
@@ -141,4 +143,13 @@ void hide_show_timestamps(void) {
   free(smenu_items);
   smenu_items = NULL;
   window_stack_remove(s_window, true);
+}
+
+ActionBarLayer *abl;
+
+void show_action_bar(int idx, void *ctx) {
+  abl = action_bar_layer_create();
+  action_bar_layer_add_to_window(abl, s_window);
+//   layer_add_child(window_get_root_layer(window), (Layer *) smenu_layer);
+  layer_mark_dirty(window_get_root_layer(s_window));
 }
