@@ -40,6 +40,7 @@ static Window *window;
 static SimpleMenuLayer *smenu_layer;
 static SimpleMenuSection smenu_sections[NSECTIONS];
 static SimpleMenuItem smenu_items[NITEMS];
+bool ui_initialized = false;
 
 #define NCHARS 30
 static char format_strs[NITEMS][NCHARS];
@@ -53,15 +54,17 @@ static void set_format(int idx, void *ctx) {
   
   // Write the data
   strncpy(format, formats[idx], sizeof(format) - 1);
-  persist_write_int(KTS_FORMAT, (int) idx);
+  persist_write_int(KTS_FORMAT, idx);
   
-  // Show some feedback, then hide it after set time.
-  smenu_items[idx].subtitle = "Set!";
-  smenu_items[idx].callback = NULL;
-  layer_mark_dirty((Layer *) smenu_layer);
-  
-  // Have to use this tricky conversion to get an int passed to callback
-  app_timer_register(MSG_DELAY, set_format_end, (void *) ((long) idx));
+  if (ui_initialized) {
+    // Show some feedback, then hide it after set time.
+    smenu_items[idx].subtitle = "Set!";
+    smenu_items[idx].callback = NULL;
+    layer_mark_dirty((Layer *) smenu_layer);
+
+    // Have to use this tricky conversion to get an int passed to callback
+    app_timer_register(MSG_DELAY, set_format_end, (void *) ((long) idx));
+  }
 }
 
 /*
@@ -92,6 +95,7 @@ void init_timestamp_format(void) {
   // Check if there's a user-saved value.
   // If so, and it's out of range, default to 0.
   if (persist_exists(KTS_FORMAT)) {
+    
     idx = (uint32_t) persist_read_int(KTS_FORMAT);
     if (idx > NFORMATS) {
       idx = 0;
@@ -102,12 +106,13 @@ void init_timestamp_format(void) {
     }
   }
   
-  set_format(idx, NULL);
+  set_format((int) idx, NULL);
 }
 
 static void hide_timestamp_format(Window *w) {
   window_destroy(w);
   window_stack_remove(w, true);
+  ui_initialized = false;
   // TODO: Cancel set_format_end() timer?
 }
 
@@ -148,6 +153,7 @@ static void show_timestamp_format(void) {
                   NULL);
   layer_add_child(window_get_root_layer(window), (Layer *) smenu_layer);
   window_stack_push(window, true);
+  ui_initialized = true;
 }
 
 void timestamp_format_callback(int idx, void *ctx) {
