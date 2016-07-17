@@ -148,3 +148,15 @@ uint32_t get_entries(time_t **entries) {
   APP_LOG(APP_LOG_LEVEL_INFO, "Got %u entries", (unsigned int) num_entries);
   return num_entries;
 }
+
+// The idx is from the menu; need to + 1 to get it from storage.
+time_t get_entry(int idx) {
+  uint32_t i = (uint32_t) idx;
+  // Don't let the index go out of bounds.
+  // TODO: ERROR: idx 0: 3 entries < 0 - 1
+  if (num_entries < 1 || num_entries < i - 1 ||
+      i >= MAX_TIMESTAMPS || !persist_exists((uint32_t) i + 1)) {
+    return 0;
+  }
+  return (time_t) persist_read_int(i + 1);
+}

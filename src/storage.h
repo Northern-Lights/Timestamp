@@ -47,3 +47,9 @@ status_t delete_all_entries(void);
  * The array must be freed when no longer used.
  */
 uint32_t get_entries(time_t **timestamps);
+
+/*
+ * Get an entry by index.
+ * Note: May be phased out if we implement storage by linked list.
+ */
+time_t get_entry(int idx);
