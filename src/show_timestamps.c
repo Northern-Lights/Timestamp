@@ -3,6 +3,7 @@
 
 #include "timestamp_format.h"
 #include "storage.h"
+#include "view_timestamp.h"
 
 #define MSG_DELAY (3 * 1000)
 
@@ -46,8 +47,6 @@ void show_timestamps_callback(int idx, void *ctx) {
   show_show_timestamps();
 }
 
-void show_action_bar(int idx, void *ctx);
-
 static uint32_t setup_timestamp_menu(Window *window) {
   
   // Get saved timestamps and create an array for them
@@ -59,13 +58,21 @@ static uint32_t setup_timestamp_menu(Window *window) {
     time_t epoch = entries[i];
     struct tm *timedata = localtime(&epoch);
     char *title = (char *) malloc(64 * sizeof(char));  // Need non-stack mem
-    strftime(title, 64, get_format(), timedata);
+    
+    // Get the format string. If %u for epoch, then we need snprintf, not strftime.
+    char *fmt = get_format();
+    if (strcmp(fmt, "%u") == 0)
+      snprintf(title, 64, fmt, epoch);
+    else
+      strftime(title, 64, get_format(), timedata);
+    
     smenu_items[i] = (SimpleMenuItem) {
 //       .title = title,
 //       .subtitle = NULL,
       .title = NULL,
       .subtitle = title,
-      .callback = show_action_bar
+//       .callback = show_action_bar
+      .callback = view_timestamp
     };
   }
   
@@ -143,13 +150,4 @@ void hide_show_timestamps(void) {
   free(smenu_items);
   smenu_items = NULL;
   window_stack_remove(s_window, true);
-}
-
-ActionBarLayer *abl;
-
-void show_action_bar(int idx, void *ctx) {
-  abl = action_bar_layer_create();
-  action_bar_layer_add_to_window(abl, s_window);
-//   layer_add_child(window_get_root_layer(window), (Layer *) smenu_layer);
-  layer_mark_dirty(window_get_root_layer(s_window));
 }

@@ -21,12 +21,16 @@ static void hide_timestamp_format(Window *w);
 static const char *formats[] = {
   "%x %X",  // 08/23/01 14:55:02
   "%x %R",  // 08/23/01 14:55
-  "%x %r"  // 08/23/01 02:55:02 pm
+  "%x %r",  // 08/23/01 02:55:02 pm
+  "%u"      // 998603702 (epoch)
 };
 
 // set_format() fills this which is passed around to
 // other modules via get_format().
 static char format[FMT_SIZE];
+
+// The formatted timestamp. Return this in get_formatted_timestamp()
+static char formatted_time[TS_STR_SIZE];
 
 #define NFORMATS ((int)(sizeof(formats)/sizeof(char *)))
 
@@ -87,6 +91,22 @@ char *get_format(void) {
   return format;
 }
 
+char *get_formatted_timestamp(time_t timestamp) {
+  
+  // Get the user's selected format string
+  char *fmt = get_format();
+  
+  // If the user wants epoch time, we can't use strftime
+  if (strcmp(fmt, "%u") == 0) {
+    snprintf(formatted_time, TS_STR_SIZE - 1, fmt, timestamp);
+  } else {
+    struct tm *timedata = localtime(&timestamp);
+    strftime(formatted_time, TS_STR_SIZE, fmt, timedata);
+  }
+  
+  return formatted_time;
+}
+
 void init_timestamp_format(void) {
   
   // Default to the first format if not saved by user.
@@ -95,12 +115,11 @@ void init_timestamp_format(void) {
   // Check if there's a user-saved value.
   // If so, and it's out of range, default to 0.
   if (persist_exists(KTS_FORMAT)) {
-    
     idx = (uint32_t) persist_read_int(KTS_FORMAT);
     if (idx > NFORMATS) {
       idx = 0;
       APP_LOG(APP_LOG_LEVEL_WARNING,
-              "TS_FORMAT is %u, but there are only %u formats.",
+              "TS_FORMAT is %u, but there are only %u formats. Defaulting to 0.",
               (unsigned int) idx,
               (unsigned int) NFORMATS);
     }
