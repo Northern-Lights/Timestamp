@@ -56,22 +56,17 @@ static uint32_t setup_timestamp_menu(Window *window) {
   // For each time_t (epoch) timestamp, convert to string for menu display
   for (uint32_t i = 0; i < num_entries; i++) {
     time_t epoch = entries[i];
-    struct tm *timedata = localtime(&epoch);
-    char *title = (char *) malloc(64 * sizeof(char));  // Need non-stack mem
+  
+    // Get the timestamp string, copy it over since we need it in persistent memory.
+    const size_t len = 64;
+    char *title = (char *) malloc(len * sizeof(char));
+    strncpy(title, get_formatted_timestamp(epoch), len-1);
+    title[len-1] = '\0';
     
-    // Get the format string. If %u for epoch, then we need snprintf, not strftime.
-    char *fmt = get_format();
-    if (strcmp(fmt, "%u") == 0)
-      snprintf(title, 64, fmt, epoch);
-    else
-      strftime(title, 64, get_format(), timedata);
-    
+    // Set the menu items
     smenu_items[i] = (SimpleMenuItem) {
-//       .title = title,
-//       .subtitle = NULL,
       .title = NULL,
       .subtitle = title,
-//       .callback = show_action_bar
       .callback = view_timestamp
     };
   }
@@ -135,7 +130,6 @@ void show_show_timestamps(void) {
   } else {
     setup_no_entries_window(s_window);
   }
-  
 }
 
 void hide_show_timestamps(void) {
