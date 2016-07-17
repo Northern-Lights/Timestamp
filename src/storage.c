@@ -45,7 +45,7 @@ uint32_t available_entries() {
 // Linear search to find index of our timestamp
 // Return 0 on error since that is not used by timestamps.
 static uint32_t get_timestamp_index(time_t timestamp) {
-  for (uint32_t i = 0; i <= num_entries; i++) {
+  for (uint32_t i = 0; i < num_entries; i++) {
     if (!persist_exists(i)) {
       APP_LOG(
         APP_LOG_LEVEL_ERROR,
@@ -64,7 +64,7 @@ static uint32_t get_timestamp_index(time_t timestamp) {
 
 // Need to check that we have not exceeded MAX_ENTRIES
 status_t add_entry(time_t timestamp) {
-  uint32_t position = num_entries + 1;
+  uint32_t position = num_entries;
   status_t result = persist_write_int(position, (int) timestamp);
   if (result >= S_SUCCESS) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Successful write");
@@ -82,7 +82,7 @@ status_t add_entry(time_t timestamp) {
 status_t delete_entry(uint32_t index) {
   
   // Shift everything to the right of index toward the beginning of the array
-  for (uint32_t i = index; i <= num_entries - 1; i++) {
+  for (uint32_t i = index; i < num_entries; i++) {
     if (persist_exists(i) && persist_exists(i+1)) {
       APP_LOG(APP_LOG_LEVEL_INFO, "Left and right exist for delete");
       persist_write_int(i, persist_read_int(i+1));
@@ -111,7 +111,8 @@ status_t delete_entry(uint32_t index) {
 
 status_t delete_all_entries() {
   APP_LOG(APP_LOG_LEVEL_INFO, "Deleting all %u entries", (unsigned int) num_entries);
-  for (uint32_t i = num_entries; i >= 1; i--) {
+//   for (uint32_t i = num_entries; i >= 1; i--) {
+  for (uint32_t i = 0; i < num_entries; i++) {
     APP_LOG(APP_LOG_LEVEL_INFO, "Trying to delete entry %u", (unsigned int) i);
     status_t result = delete_entry(i);
     if (result < S_SUCCESS) {
@@ -124,39 +125,36 @@ status_t delete_all_entries() {
   return E_ERROR;
 }
 
-// TODO: Allow NULL **entries to just return # of available entries.
+// TODO: Allow NULL **entries input to just return # of available entries.
 uint32_t get_entries(time_t **entries) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "Getting entries");
   if (num_entries < 1) {
     entries = NULL;
     return 0;
   }
   *entries = (time_t *) malloc(num_entries * sizeof(time_t));
-  APP_LOG(APP_LOG_LEVEL_INFO, "Initialized entry array %p", entries);
   
   // Get entries, stick them in the array.
   // If we run into a 0 time_t, error. Return NULL.
-  for (uint32_t i = 1; i <= num_entries; i++) {
+  for (uint32_t i = 0; i < num_entries; i++) {
     time_t entry = persist_read_int(i);
-    APP_LOG(APP_LOG_LEVEL_INFO, "Got entry %u: %u", (unsigned int) i, (unsigned int) entry);
     if (!entry) {
       free(entries);
       return 0;
     }
-    (*entries)[i-1] = entry;
+    (*entries)[i] = entry;
   }
-  APP_LOG(APP_LOG_LEVEL_INFO, "Got %u entries", (unsigned int) num_entries);
   return num_entries;
 }
 
-// The idx is from the menu; need to + 1 to get it from storage.
 time_t get_entry(int idx) {
   uint32_t i = (uint32_t) idx;
+  
   // Don't let the index go out of bounds.
-  // TODO: ERROR: idx 0: 3 entries < 0 - 1
-  if (num_entries < 1 || num_entries < i - 1 ||
-      i >= MAX_TIMESTAMPS || !persist_exists((uint32_t) i + 1)) {
+  if (num_entries < 1 || i >= num_entries ||
+  i >= MAX_TIMESTAMPS || !persist_exists(i)) {
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Error accessing entry %d", idx);
     return 0;
   }
-  return (time_t) persist_read_int(i + 1);
+  
+  return (time_t) persist_read_int(i);
 }

@@ -61,7 +61,6 @@ void hide_view_timestamp(void) {
 static int selected = 0;
 
 void view_timestamp(int idx, void *ctx) {
-  APP_LOG(APP_LOG_LEVEL_INFO, "view_timestamp idx = %d", idx);
   show_view_timestamp();
   // TODO: Add Click config providers here.
   if (idx >= 0 && idx <= MAX_TIMESTAMPS) {
